@@ -224,6 +224,7 @@ where
 	}
 
 	/// Updates best and worst transactions from a sender.
+	#[allow(clippy::type_complexity)]
 	fn update_senders_worst_and_best(
 		&mut self,
 		previous: Option<((S::Score, Transaction<T>), (S::Score, Transaction<T>))>,
@@ -474,7 +475,7 @@ where
 	pub fn status<R: Ready<T>>(&self, mut ready: R) -> Status {
 		let mut status = Status::default();
 
-		for (_sender, transactions) in &self.transactions {
+		for transactions in self.transactions.values() {
 			let len = transactions.len();
 			for (idx, tx) in transactions.iter().enumerate() {
 				match ready.is_ready(tx) {

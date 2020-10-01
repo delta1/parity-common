@@ -92,6 +92,7 @@ pub fn sign<T>(k: &SigKey<T>, data: &[u8]) -> Signature<T> {
 /// Stateful HMAC computation.
 pub struct Signer<T>(SignerInner, PhantomData<T>);
 
+#[allow(clippy::large_enum_variant)]
 enum SignerInner {
 	Sha256(Hmac<sha2::Sha256>),
 	Sha512(Hmac<sha2::Sha512>),

@@ -54,6 +54,7 @@ impl<T: fmt::Debug, S: Scoring<T>> Transactions<T, S> {
 		self.transactions.iter()
 	}
 
+	#[allow(clippy::type_complexity)]
 	pub fn worst_and_best(&self) -> Option<((S::Score, Transaction<T>), (S::Score, Transaction<T>))> {
 		let len = self.scores.len();
 		self.scores.get(0).cloned().map(|best| {
