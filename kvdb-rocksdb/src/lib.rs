@@ -910,7 +910,9 @@ mod tests {
 
 		{
 			let db = db.db.read();
-			if let Some(db) = db.as_ref() { assert!(db.static_property_or_warn(0, "rocksdb.cur-size-all-mem-tables") > 512); }
+			if let Some(db) = db.as_ref() {
+				assert!(db.static_property_or_warn(0, "rocksdb.cur-size-all-mem-tables") > 512);
+			}
 		}
 	}
 
