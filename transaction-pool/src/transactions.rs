@@ -54,6 +54,7 @@ impl<T: fmt::Debug, S: Scoring<T>> Transactions<T, S> {
 		self.transactions.iter()
 	}
 
+	#[allow(clippy::type_complexity)]
 	pub fn worst_and_best(&self) -> Option<((S::Score, Transaction<T>), (S::Score, Transaction<T>))> {
 		let len = self.scores.len();
 		self.scores.get(0).cloned().map(|best| {
@@ -157,7 +158,7 @@ impl<T: fmt::Debug, S: Scoring<T>> Transactions<T, S> {
 		self.scores.remove(index);
 		// Update scoring
 		scoring.update_scores(&self.transactions, &mut self.scores, scoring::Change::RemovedAt(index));
-		return true;
+		true
 	}
 
 	pub fn cull<R: Ready<T>>(&mut self, ready: &mut R, scoring: &S) -> SmallVec<[Transaction<T>; PER_SENDER]> {

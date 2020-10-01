@@ -219,7 +219,7 @@ fn should_construct_pending() {
 	let mut pending = txq.pending(NonceReady::default()).take_while(|tx| {
 		let should_take = tx.gas + current_gas <= limit;
 		if should_take {
-			current_gas = current_gas + tx.gas
+			current_gas += tx.gas
 		}
 		should_take
 	});
@@ -292,7 +292,7 @@ fn should_return_unordered_iterator() {
 		vec![chain2.clone(), chain3.clone(), chain1.clone()],
 		vec![chain3.clone(), chain2.clone(), chain1.clone()],
 		vec![chain3.clone(), chain1.clone(), chain2.clone()],
-		vec![chain1.clone(), chain3.clone(), chain2.clone()],
+		vec![chain1, chain3, chain2],
 	]
 	.into_iter()
 	.map(|mut v| {
@@ -343,7 +343,7 @@ fn should_update_scoring_correctly() {
 	let mut pending = txq.pending(NonceReady::default()).take_while(|tx| {
 		let should_take = tx.gas + current_gas <= limit;
 		if should_take {
-			current_gas = current_gas + tx.gas
+			current_gas += tx.gas
 		}
 		should_take
 	});
@@ -555,23 +555,23 @@ mod listener {
 		}
 
 		fn rejected<H: fmt::Debug + fmt::LowerHex>(&mut self, _tx: &SharedTransaction, _reason: &error::Error<H>) {
-			self.0.borrow_mut().push("rejected".into());
+			self.0.borrow_mut().push("rejected");
 		}
 
 		fn dropped(&mut self, _tx: &SharedTransaction, _new: Option<&Transaction>) {
-			self.0.borrow_mut().push("dropped".into());
+			self.0.borrow_mut().push("dropped");
 		}
 
 		fn invalid(&mut self, _tx: &SharedTransaction) {
-			self.0.borrow_mut().push("invalid".into());
+			self.0.borrow_mut().push("invalid");
 		}
 
 		fn canceled(&mut self, _tx: &SharedTransaction) {
-			self.0.borrow_mut().push("canceled".into());
+			self.0.borrow_mut().push("canceled");
 		}
 
 		fn culled(&mut self, _tx: &SharedTransaction) {
-			self.0.borrow_mut().push("culled".into());
+			self.0.borrow_mut().push("culled");
 		}
 	}
 

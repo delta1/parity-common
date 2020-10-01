@@ -9,7 +9,7 @@
 mod iter;
 mod stats;
 
-use std::{cmp, collections::HashMap, convert::identity, error, fs, io, mem, path::Path, result};
+use std::{cmp, collections::HashMap, error, fs, io, mem, path::Path, result};
 
 use parity_util_mem::MallocSizeOf;
 use parking_lot::RwLock;
@@ -575,7 +575,7 @@ impl Database {
 		} else {
 			None
 		};
-		optional.into_iter().flat_map(identity)
+		optional.into_iter().flatten()
 	}
 
 	/// Iterator over data in the `col` database column index matching the given prefix.
@@ -594,7 +594,7 @@ impl Database {
 		} else {
 			None
 		};
-		optional.into_iter().flat_map(identity)
+		optional.into_iter().flatten()
 	}
 
 	/// Close the database
@@ -743,12 +743,12 @@ impl KeyValueDB for Database {
 
 	fn iter<'a>(&'a self, col: u32) -> Box<dyn Iterator<Item = KeyValuePair> + 'a> {
 		let unboxed = Database::iter(self, col);
-		Box::new(unboxed.into_iter())
+		Box::new(unboxed)
 	}
 
 	fn iter_with_prefix<'a>(&'a self, col: u32, prefix: &'a [u8]) -> Box<dyn Iterator<Item = KeyValuePair> + 'a> {
 		let unboxed = Database::iter_with_prefix(self, col, prefix);
-		Box::new(unboxed.into_iter())
+		Box::new(unboxed)
 	}
 
 	fn restore(&self, new_db: &str) -> io::Result<()> {
@@ -910,9 +910,9 @@ mod tests {
 
 		{
 			let db = db.db.read();
-			db.as_ref().map(|db| {
+			if let Some(db) = db.as_ref() {
 				assert!(db.static_property_or_warn(0, "rocksdb.cur-size-all-mem-tables") > 512);
-			});
+			}
 		}
 	}
 
@@ -1084,32 +1084,32 @@ rocksdb.db.get.micros P50 : 2.000000 P95 : 3.000000 P99 : 4.000000 P100 : 5.0000
 		// LRU cache for non-default columns is ⅓ of memory budget (including default column)
 		let lru_size = (330 * MB) / 3;
 		let needle = format!("block_cache_options:\n    capacity : {}", lru_size);
-		let lru = settings.match_indices(&needle).collect::<Vec<_>>().len();
+		let lru = settings.match_indices(&needle).count();
 		assert_eq!(lru, NUM_COLS);
 
 		// Index/filters share cache
-		let include_indexes = settings.matches("cache_index_and_filter_blocks: 1").collect::<Vec<_>>().len();
+		let include_indexes = settings.matches("cache_index_and_filter_blocks: 1").count();
 		assert_eq!(include_indexes, NUM_COLS);
 		// Pin index/filters on L0
-		let pins = settings.matches("pin_l0_filter_and_index_blocks_in_cache: 1").collect::<Vec<_>>().len();
+		let pins = settings.matches("pin_l0_filter_and_index_blocks_in_cache: 1").count();
 		assert_eq!(pins, NUM_COLS);
 
 		// Check target file size, aka initial file size
-		let l0_sizes = settings.matches("target_file_size_base: 102030").collect::<Vec<_>>().len();
+		let l0_sizes = settings.matches("target_file_size_base: 102030").count();
 		assert_eq!(l0_sizes, NUM_COLS);
 		// The default column uses the default of 64Mb regardless of the setting.
 		assert!(settings.contains("target_file_size_base: 67108864"));
 
 		// Check compression settings
-		let snappy_compression = settings.matches("Options.compression: Snappy").collect::<Vec<_>>().len();
+		let snappy_compression = settings.matches("Options.compression: Snappy").count();
 		// All columns use Snappy
 		assert_eq!(snappy_compression, NUM_COLS + 1);
 		// …even for L7
-		let snappy_bottommost = settings.matches("Options.bottommost_compression: Disabled").collect::<Vec<_>>().len();
+		let snappy_bottommost = settings.matches("Options.bottommost_compression: Disabled").count();
 		assert_eq!(snappy_bottommost, NUM_COLS + 1);
 
 		// 7 levels
-		let levels = settings.matches("Options.num_levels: 7").collect::<Vec<_>>().len();
+		let levels = settings.matches("Options.num_levels: 7").count();
 		assert_eq!(levels, NUM_COLS + 1);
 
 		// Don't fsync every store
