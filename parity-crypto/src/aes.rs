@@ -72,7 +72,7 @@ impl AesCtr256 {
 /// If possible prefer `inplace_encrypt_128_ctr` to avoid a slice copy.
 pub fn encrypt_128_ctr(k: &[u8], iv: &[u8], plain: &[u8], dest: &mut [u8]) -> Result<(), SymmError> {
 	let mut encryptor = aes_ctr::Aes128Ctr::new(GenericArray::from_slice(k), GenericArray::from_slice(iv));
-	&mut dest[..plain.len()].copy_from_slice(plain);
+	dest[..plain.len()].copy_from_slice(plain);
 	encryptor.try_apply_keystream(dest)?;
 	Ok(())
 }
@@ -95,7 +95,7 @@ pub fn inplace_encrypt_128_ctr(k: &[u8], iv: &[u8], data: &mut [u8]) -> Result<(
 pub fn decrypt_128_ctr(k: &[u8], iv: &[u8], encrypted: &[u8], dest: &mut [u8]) -> Result<(), SymmError> {
 	let mut encryptor = aes_ctr::Aes128Ctr::new(GenericArray::from_slice(k), GenericArray::from_slice(iv));
 
-	&mut dest[..encrypted.len()].copy_from_slice(encrypted);
+	dest[..encrypted.len()].copy_from_slice(encrypted);
 	encryptor.try_apply_keystream(dest)?;
 	Ok(())
 }
@@ -117,7 +117,7 @@ pub fn inplace_decrypt_128_ctr(k: &[u8], iv: &[u8], data: &mut [u8]) -> Result<(
 /// An error is returned if the input lengths are invalid.
 pub fn decrypt_128_cbc(k: &[u8], iv: &[u8], encrypted: &[u8], dest: &mut [u8]) -> Result<usize, SymmError> {
 	let encryptor = Cbc::<Aes128, Pkcs7>::new_var(k, iv)?;
-	&mut dest[..encrypted.len()].copy_from_slice(encrypted);
+	dest[..encrypted.len()].copy_from_slice(encrypted);
 	let unpad_length = { encryptor.decrypt(&mut dest[..encrypted.len()])?.len() };
 	Ok(unpad_length)
 }
@@ -130,7 +130,7 @@ mod tests {
 	// only use for test could be expose in the future
 	fn encrypt_128_cbc(k: &[u8], iv: &[u8], plain: &[u8], dest: &mut [u8]) -> Result<(), SymmError> {
 		let encryptor = Cbc::<Aes128, Pkcs7>::new_var(k, iv)?;
-		&mut dest[..plain.len()].copy_from_slice(plain);
+		dest[..plain.len()].copy_from_slice(plain);
 		encryptor.encrypt(dest, plain.len())?;
 		Ok(())
 	}

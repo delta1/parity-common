@@ -34,9 +34,9 @@ impl ContractAddress {
 	pub fn from_sender_salt_and_code(sender: &Address, salt: H256, code_hash: H256) -> Self {
 		let mut buffer = [0u8; 1 + 20 + 32 + 32];
 		buffer[0] = 0xff;
-		&mut buffer[1..(1 + 20)].copy_from_slice(&sender[..]);
-		&mut buffer[(1 + 20)..(1 + 20 + 32)].copy_from_slice(&salt[..]);
-		&mut buffer[(1 + 20 + 32)..].copy_from_slice(&code_hash[..]);
+		buffer[1..(1 + 20)].copy_from_slice(&sender[..]);
+		buffer[(1 + 20)..(1 + 20 + 32)].copy_from_slice(&salt[..]);
+		buffer[(1 + 20 + 32)..].copy_from_slice(&code_hash[..]);
 
 		ContractAddress(Address::from(keccak(&buffer[..])))
 	}
@@ -46,8 +46,8 @@ impl ContractAddress {
 	/// Used by pwasm create ext.
 	pub fn from_sender_and_code(sender: &Address, code_hash: H256) -> Self {
 		let mut buffer = [0u8; 20 + 32];
-		&mut buffer[..20].copy_from_slice(&sender[..]);
-		&mut buffer[20..].copy_from_slice(&code_hash[..]);
+		buffer[..20].copy_from_slice(&sender[..]);
+		buffer[20..].copy_from_slice(&code_hash[..]);
 
 		ContractAddress(Address::from(keccak(&buffer[..])))
 	}

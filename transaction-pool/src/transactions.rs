@@ -157,7 +157,7 @@ impl<T: fmt::Debug, S: Scoring<T>> Transactions<T, S> {
 		self.scores.remove(index);
 		// Update scoring
 		scoring.update_scores(&self.transactions, &mut self.scores, scoring::Change::RemovedAt(index));
-		return true;
+		true
 	}
 
 	pub fn cull<R: Ready<T>>(&mut self, ready: &mut R, scoring: &S) -> SmallVec<[Transaction<T>; PER_SENDER]> {

@@ -195,12 +195,12 @@ where
 			AddResult::TooCheap { new, old } => {
 				let error = error::Error::TooCheapToReplace(old.hash().clone(), new.hash().clone());
 				self.listener.rejected(&new, &error);
-				return Err(error);
+				Err(error)
 			}
 			AddResult::TooCheapToEnter(new, score) => {
 				let error = error::Error::TooCheapToEnter(new.hash().clone(), format!("{:#x}", score));
 				self.listener.rejected(&new, &error);
-				return Err(error);
+				Err(error)
 			}
 		}
 	}
