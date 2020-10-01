@@ -379,6 +379,7 @@ macro_rules! construct_uint {
 				}
 			}
 
+			#[allow(clippy::reversed_empty_ranges)]
 			impl $name {
 				/// Low 2 words (u128)
 				#[inline]
@@ -405,6 +406,7 @@ macro_rules! construct_uint {
 				}
 			}
 
+			#[allow(clippy::reversed_empty_ranges)]
 			impl $crate::core_::convert::TryFrom<$name> for u128 {
 				type Error = &'static str;
 
@@ -456,6 +458,7 @@ macro_rules! construct_uint {
 			}
 		}
 
+		#[allow(clippy::reversed_empty_ranges)]
 		impl $name {
 			const WORD_BITS: usize = 64;
 			/// Maximum value.
@@ -1605,16 +1608,16 @@ macro_rules! impl_quickcheck_arbitrary_for_uint {
 				// make it more likely to generate smaller numbers that
 				// don't use up the full $n_bytes
 				let range =
-															// 10% chance to generate number that uses up to $n_bytes
-															if p < 0.1 {
-																$n_bytes
-															// 10% chance to generate number that uses up to $n_bytes / 2
-															} else if p < 0.2 {
-																$n_bytes / 2
-															// 80% chance to generate number that uses up to $n_bytes / 5
-															} else {
-																$n_bytes / 5
-															};
+																											// 10% chance to generate number that uses up to $n_bytes
+																											if p < 0.1 {
+																												$n_bytes
+																											// 10% chance to generate number that uses up to $n_bytes / 2
+																											} else if p < 0.2 {
+																												$n_bytes / 2
+																											// 80% chance to generate number that uses up to $n_bytes / 5
+																											} else {
+																												$n_bytes / 5
+																											};
 
 				let size = g.gen_range(0, range);
 				g.fill_bytes(&mut res[..size]);
